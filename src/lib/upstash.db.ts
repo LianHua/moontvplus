@@ -673,13 +673,12 @@ export class UpstashRedisStorage implements IStorage {
 
   // ---------- 获取全部用户 ----------
   async getAllUsers(): Promise<string[]> {
-    const keys = await withRetry(() => this.client.keys('u:*:pwd'));
-    return keys
-      .map((k) => {
-        const match = k.match(/^u:(.+?):pwd$/);
-        return match ? ensureString(match[1]) : undefined;
-      })
-      .filter((u): u is string => typeof u === 'string');
+    // 从新版用户列表获取
+    const userListKey = this.userListKey();
+    const users = await withRetry(() =>
+      this.client.zrange(userListKey, 0, -1)
+    );
+    return users.map(u => ensureString(u));
   }
 
   // ---------- 管理员配置 ----------
