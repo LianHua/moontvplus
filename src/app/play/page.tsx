@@ -6301,6 +6301,58 @@ function PlayPageClient() {
                           </span>
                         </button>
 
+                        {/* 复制视频链接按钮 */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // 如果当前是代理播放模式，使用原始 URL；否则使用当前 videoUrl
+                            let urlToUse = videoUrl;
+                            if (sourceProxyMode && detail?.episodes && currentEpisodeIndex < detail.episodes.length) {
+                              urlToUse = detail.episodes[currentEpisodeIndex];
+                            }
+                            // 使用代理 URL（与外部播放器逻辑一致）
+                            const tokenParam = proxyToken ? `&token=${encodeURIComponent(proxyToken)}` : '';
+                            const proxyUrl = externalPlayerAdBlock
+                              ? `${window.location.origin}/api/proxy-m3u8?url=${encodeURIComponent(urlToUse)}&source=${encodeURIComponent(currentSource)}${tokenParam}`
+                              : urlToUse;
+
+                            // 复制到剪贴板
+                            navigator.clipboard.writeText(proxyUrl).then(() => {
+                              setToast({
+                                message: '视频链接已复制到剪贴板',
+                                type: 'success',
+                                onClose: () => setToast(null),
+                              });
+                            }).catch((err) => {
+                              console.error('复制失败:', err);
+                              setToast({
+                                message: '复制失败，请重试',
+                                type: 'error',
+                                onClose: () => setToast(null),
+                              });
+                            });
+                          }}
+                          className='group relative flex items-center justify-center gap-1 w-8 h-8 lg:w-auto lg:h-auto lg:px-2 lg:py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-md transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer overflow-hidden border border-blue-400 flex-shrink-0'
+                          title='复制视频链接'
+                        >
+                          <svg
+                            className='w-4 h-4 flex-shrink-0 text-white'
+                            fill='none'
+                stroke='currentColor'
+                            viewBox='0 0 24 24'
+                          >
+                            <path
+                              strokeLinecap='round'
+                           strokeLinejoin='round'
+                              strokeWidth='2'
+                              d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
+                            />
+                          </svg>
+                          <span className='hidden lg:inline max-w-0 group-hover:max-w-[100px] overflow-hidden whitespace-nowrap transition-all duration-200 ease-in-out text-white'>
+                            复制链接
+                          </span>
+                        </button>
+
                         {/* PotPlayer */}
                         <button
                           onClick={(e) => {
