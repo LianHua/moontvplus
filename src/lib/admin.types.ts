@@ -95,6 +95,14 @@ export interface AdminConfig {
     channelNumber?: number;
     disabled?: boolean;
   }[];
+  WebLiveConfig?: {
+    key: string;
+    name: string;
+    platform: string; // 直播平台类型，如 'huya'
+    roomId: string; // 房间ID
+    from: 'config' | 'custom';
+    disabled?: boolean;
+  }[];
   ThemeConfig?: {
     enableBuiltInTheme: boolean; // 是否启用内置主题
     builtInTheme: string; // 内置主题名称

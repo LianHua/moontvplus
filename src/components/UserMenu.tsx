@@ -113,6 +113,7 @@ export const UserMenu: React.FC = () => {
   const [bufferStrategy, setBufferStrategy] = useState('medium');
   const [nextEpisodePreCache, setNextEpisodePreCache] = useState(true);
   const [nextEpisodeDanmakuPreload, setNextEpisodeDanmakuPreload] = useState(true);
+  const [disableAutoLoadDanmaku, setDisableAutoLoadDanmaku] = useState(false);
   const [searchTraditionalToSimplified, setSearchTraditionalToSimplified] = useState(false);
 
   // 邮件通知设置
@@ -400,6 +401,11 @@ export const UserMenu: React.FC = () => {
       const savedNextEpisodeDanmakuPreload = localStorage.getItem('nextEpisodeDanmakuPreload');
       if (savedNextEpisodeDanmakuPreload !== null) {
         setNextEpisodeDanmakuPreload(savedNextEpisodeDanmakuPreload === 'true');
+      }
+
+      const savedDisableAutoLoadDanmaku = localStorage.getItem('disableAutoLoadDanmaku');
+      if (savedDisableAutoLoadDanmaku !== null) {
+        setDisableAutoLoadDanmaku(savedDisableAutoLoadDanmaku === 'true');
       }
 
       // 加载首页模块配置
@@ -758,6 +764,13 @@ export const UserMenu: React.FC = () => {
     }
   };
 
+  const handleDisableAutoLoadDanmakuToggle = (value: boolean) => {
+    setDisableAutoLoadDanmaku(value);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('disableAutoLoadDanmaku', String(value));
+    }
+  };
+
   const handleSearchTraditionalToSimplifiedToggle = (value: boolean) => {
     setSearchTraditionalToSimplified(value);
     if (typeof window !== 'undefined') {
@@ -857,6 +870,7 @@ export const UserMenu: React.FC = () => {
     setBufferStrategy('medium');
     setNextEpisodePreCache(true);
     setNextEpisodeDanmakuPreload(true);
+    setDisableAutoLoadDanmaku(false);
     setHomeModules(defaultHomeModules);
     setSearchTraditionalToSimplified(false);
 
@@ -875,6 +889,7 @@ export const UserMenu: React.FC = () => {
       localStorage.setItem('bufferStrategy', 'medium');
       localStorage.setItem('nextEpisodePreCache', 'true');
       localStorage.setItem('nextEpisodeDanmakuPreload', 'true');
+      localStorage.setItem('disableAutoLoadDanmaku', 'false');
       localStorage.setItem('homeModules', JSON.stringify(defaultHomeModules));
       localStorage.setItem('searchTraditionalToSimplified', 'false');
       window.dispatchEvent(new CustomEvent('homeModulesUpdated'));
@@ -910,7 +925,8 @@ export const UserMenu: React.FC = () => {
 
   // 检查是否显示管理面板按钮
   const showAdminPanel =
-    authInfo?.role === 'owner' || authInfo?.role === 'admin';
+    (authInfo?.role === 'owner' || authInfo?.role === 'admin') &&
+    storageType !== 'localstorage';
 
   // 检查是否显示离线下载按钮
   const showOfflineDownload =
@@ -1814,6 +1830,30 @@ export const UserMenu: React.FC = () => {
               </button>
               {isDanmakuSectionOpen && (
                 <div className='p-3 md:p-4 space-y-4 md:space-y-6'>
+                  {/* 禁用自动装填弹幕 */}
+                  <div className='flex items-center justify-between'>
+                    <div>
+                      <h4 className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                        禁用自动装填弹幕
+                      </h4>
+                      <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                        开启后，播放页面不会自动匹配弹幕，只能手动匹配
+                      </p>
+                    </div>
+                    <label className='flex items-center cursor-pointer'>
+                      <div className='relative'>
+                        <input
+                          type='checkbox'
+                          className='sr-only peer'
+                          checked={disableAutoLoadDanmaku}
+                          onChange={(e) => handleDisableAutoLoadDanmakuToggle(e.target.checked)}
+                        />
+                        <div className='w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 transition-colors dark:bg-gray-600'></div>
+                        <div className='absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5'></div>
+                      </div>
+                    </label>
+                  </div>
+
                   {/* 下集弹幕预加载 */}
                   <div className='flex items-center justify-between'>
                     <div>

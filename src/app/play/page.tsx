@@ -607,6 +607,13 @@ function PlayPageClient() {
       return;
     }
 
+    // 检查是否禁用了自动装填弹幕
+    const disableAutoLoad = localStorage.getItem('disableAutoLoadDanmaku') === 'true';
+    if (disableAutoLoad) {
+      console.log('[弹幕] 已禁用自动装填弹幕，跳过自动加载');
+      return;
+    }
+
     // 检查集数是否有效且是否已改变
     if (currentEpisodeIndex < 0 || !videoTitle) {
       return;
@@ -3644,6 +3651,9 @@ function PlayPageClient() {
   // 预加载下一集弹幕（完全复制 loadDanmakuForCurrentEpisode 的逻辑）
   const preloadNextEpisodeDanmaku = async () => {
     try {
+      const disableAutoLoad = localStorage.getItem('disableAutoLoadDanmaku') === 'true';
+      if (disableAutoLoad) return;
+
       const title = videoTitleRef.current;
       if (!title) {
         return;
@@ -3970,6 +3980,9 @@ function PlayPageClient() {
 
   // 自动搜索并加载弹幕
   const autoSearchDanmaku = async () => {
+    const disableAutoLoad = localStorage.getItem('disableAutoLoadDanmaku') === 'true';
+    if (disableAutoLoad) return;
+
     const title = videoTitleRef.current;
     if (!title) {
       console.warn('视频标题为空，无法自动搜索弹幕');
